@@ -1,11 +1,42 @@
 "use strict";
 
+function syncSidebarState() {
+  const isMobile = window.matchMedia("(max-width: 900px)").matches;
+  const isOpen = els.app.classList.contains("sidebar-open");
+  const trigger = document.querySelector('[data-action="open-sidebar"]');
+  if (trigger) {
+    trigger.setAttribute("aria-expanded", String(isOpen));
+  }
+  if (isMobile && !isOpen) {
+    els.sidebar.setAttribute("inert", "");
+    els.sidebar.setAttribute("aria-hidden", "true");
+  } else {
+    els.sidebar.removeAttribute("inert");
+    els.sidebar.removeAttribute("aria-hidden");
+  }
+}
+
 function closeSidebar() {
+  const hadFocus = els.sidebar.contains(document.activeElement);
   els.app.classList.remove("sidebar-open");
+  syncSidebarState();
+  if (hadFocus && window.matchMedia("(max-width: 900px)").matches) {
+    const trigger = document.querySelector('[data-action="open-sidebar"]');
+    if (trigger) {
+      trigger.focus({ preventScroll: true });
+    }
+  }
 }
 
 function openSidebar() {
   els.app.classList.add("sidebar-open");
+  syncSidebarState();
+  if (window.matchMedia("(max-width: 900px)").matches) {
+    const closeButton = els.sidebar.querySelector(".sidebar-close");
+    if (closeButton) {
+      closeButton.focus({ preventScroll: true });
+    }
+  }
 }
 
 function navigate(type, id) {
@@ -929,6 +960,7 @@ function bindEvents() {
   });
 
   els.modal.addEventListener("close", () => {
+    els.app.classList.remove("modal-open");
     els.modal.innerHTML = "";
     state.modalType = null;
     state.modalEntityId = null;
@@ -1048,6 +1080,8 @@ function bindEvents() {
     resizeTimer = setTimeout(() => {
       if (window.innerWidth > 900) {
         closeSidebar();
+      } else {
+        syncSidebarState();
       }
     }, 120);
   });
@@ -1078,6 +1112,7 @@ function init() {
   persist();
   bindEvents();
   render();
+  syncSidebarState();
   if (didRecover) {
     setTimeout(() => showToast("Your saved data was damaged, so Stash restored the sample library. The damaged copy was backed up.", "error", { duration: 7000 }), 300);
   } else if (didSeed) {

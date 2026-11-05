@@ -136,6 +136,7 @@ function openModal(html) {
   if (!els.modal.open) {
     els.modal.showModal();
   }
+  els.app.classList.add("modal-open");
 }
 
 function closeModal() {
