@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stash — Bookmarks</title>
+  <meta name="description" content="A fast, private bookmark manager that lives entirely in your browser.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f6f7fb">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%236d5efc'/%3E%3Cstop offset='1' stop-color='%23a855f7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cpath d='M22 16h20a4 4 0 0 1 4 4v30l-14-8-14 8V20a4 4 0 0 1 4-4Z' fill='white'/%3E%3C/svg%3E">
+  <script>
+    try {
+      var saved = JSON.parse(localStorage.getItem("stash.bookmarks.v1"));
+      var theme = saved && saved.preferences && saved.preferences.theme;
+      if (theme !== "light" && theme !== "dark") {
+        theme = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      document.documentElement.dataset.theme = theme;
+    } catch (error) {
+      document.documentElement.dataset.theme = "light";
+    }
+  </script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <svg xmlns="http://www.w3.org/2000/svg" class="svg-sprite" aria-hidden="true">
+    <symbol id="i-bookmark" viewBox="0 0 24 24">
+      <path d="M6 4.5A2.5 2.5 0 0 1 8.5 2h7A2.5 2.5 0 0 1 18 4.5V21l-6-4-6 4V4.5Z"/>
+    </symbol>
+    <symbol id="i-bookmark-plus" viewBox="0 0 24 24">
+      <path d="M6 4.5A2.5 2.5 0 0 1 8.5 2h7A2.5 2.5 0 0 1 18 4.5V21l-6-4-6 4V4.5Z"/>
+      <path d="M12 7v5M9.5 9.5h5"/>
+    </symbol>
+    <symbol id="i-search" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="7"/>
+      <path d="m21 21-4.35-4.35"/>
+    </symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24">
+      <path d="M12 5v14M5 12h14"/>
+    </symbol>
+    <symbol id="i-chevron-right" viewBox="0 0 24 24">
+      <path d="m9 18 6-6-6-6"/>
+    </symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 24 24">
+      <path d="m6 9 6 6 6-6"/>
+    </symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24">
+      <path d="M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Z"/>
+    </symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24">
+      <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+      <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+      <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+      <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+    </symbol>
+    <symbol id="i-list" viewBox="0 0 24 24">
+      <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+    </symbol>
+    <symbol id="i-star" viewBox="0 0 24 24">
+      <path d="m12 3 2.7 5.47 6.03.88-4.36 4.25 1.03 6-5.4-2.84-5.4 2.84 1.03-6L3.27 9.35l6.03-.88L12 3Z"/>
+    </symbol>
+    <symbol id="i-more" viewBox="0 0 24 24">
+      <circle cx="5" cy="12" r="1"/>
+      <circle cx="12" cy="12" r="1"/>
+      <circle cx="19" cy="12" r="1"/>
+    </symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="4"/>
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/>
+    </symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/>
+    </symbol>
+    <symbol id="i-download" viewBox="0 0 24 24">
+      <path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>
+    </symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24">
+      <path d="M12 21V9M7 14l5-5 5 5M5 3h14"/>
+    </symbol>
+    <symbol id="i-x" viewBox="0 0 24 24">
+      <path d="M18 6 6 18M6 6l12 12"/>
+    </symbol>
+    <symbol id="i-link" viewBox="0 0 24 24">
+      <path d="M10 13a5 5 0 0 0 7.07 0l2.12-2.12a5 5 0 0 0-7.07-7.07L11 5"/>
+      <path d="M14 11a5 5 0 0 0-7.07 0L4.81 13.12a5 5 0 0 0 7.07 7.07L13 19"/>
+    </symbol>
+    <symbol id="i-external" viewBox="0 0 24 24">
+      <path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+    </symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24">
+      <rect x="9" y="9" width="13" height="13" rx="2"/>
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+    </symbol>
+    <symbol id="i-pencil" viewBox="0 0 24 24">
+      <path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+    </symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24">
+      <path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+      <path d="M10 11v6M14 11v6"/>
+    </symbol>
+    <symbol id="i-restore" viewBox="0 0 24 24">
+      <path d="M3 12a9 9 0 1 0 3-6.7L3 8"/>
+      <path d="M3 3v5h5"/>
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24">
+      <path d="m5 12 5 5L20 7"/>
+    </symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24">
+      <path d="M20.59 13.41 12 22l-9-9V3h10l7.59 7.59a2 2 0 0 1 0 2.82Z"/>
+      <circle cx="7.5" cy="7.5" r="1.5"/>
+    </symbol>
+    <symbol id="i-hash" viewBox="0 0 24 24">
+      <path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/>
+    </symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24">
+      <path d="M4 6h16M4 12h16M4 18h16"/>
+    </symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>
+      <path d="m9 12 2 2 4-4"/>
+    </symbol>
+    <symbol id="i-database" viewBox="0 0 24 24">
+      <ellipse cx="12" cy="5" rx="8" ry="3"/>
+      <path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/>
+      <path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/>
+    </symbol>
+    <symbol id="i-info" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M12 16v-4M12 8h.01"/>
+    </symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M12 8v4M12 16h.01"/>
+    </symbol>
+    <symbol id="i-check-circle" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="m8.5 12 2.5 2.5 4.5-5"/>
+    </symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M12 7v5l3 2"/>
+    </symbol>
+    <symbol id="i-sparkles" viewBox="0 0 24 24">
+      <path d="m12 3 1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3Z"/>
+      <path d="m19 15 .8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"/>
+    </symbol>
+    <symbol id="i-move" viewBox="0 0 24 24">
+      <path d="M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Z"/>
+      <path d="M9 13h6M13 10l3 3-3 3"/>
+    </symbol>
+    <symbol id="i-corner" viewBox="0 0 24 24">
+      <path d="M15 10l5 5-5 5M4 4v7a4 4 0 0 0 4 4h12"/>
+    </symbol>
+    <symbol id="i-code" viewBox="0 0 24 24">
+      <path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 4l-4 16"/>
+    </symbol>
+  </svg>
+
+  <div class="app" id="app">
+    <div class="sidebar-backdrop" id="sidebarBackdrop" data-action="close-sidebar"></div>
+
+    <aside class="sidebar" id="sidebar" aria-label="Sidebar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg class="icon"><use href="#i-bookmark"></use></svg>
+        </span>
+        <span class="brand-text">
+          <span class="brand-name">Stash</span>
+          <span class="brand-tag">Bookmarks</span>
+        </span>
+        <button class="icon-btn sidebar-close" data-action="close-sidebar" aria-label="Close sidebar" title="Close sidebar">
+          <svg class="icon"><use href="#i-x"></use></svg>
+        </button>
+      </div>
+
+      <div class="sidebar-scroll">
+        <nav class="nav-group" aria-label="Library">
+          <button class="nav-item" data-action="nav" data-view="all" data-nav="all">
+            <span class="nav-icon"><svg class="icon"><use href="#i-bookmark"></use></svg></span>
+            <span class="nav-label">All bookmarks</span>
+            <span class="nav-count" id="countAll">0</span>
+          </button>
+          <button class="nav-item" data-action="nav" data-view="recent" data-nav="recent">
+            <span class="nav-icon"><svg class="icon"><use href="#i-clock"></use></svg></span>
+            <span class="nav-label">Recently added</span>
+            <span class="nav-count" id="countRecent">0</span>
+          </button>
+          <button class="nav-item" data-action="nav" data-view="favorites" data-nav="favorites">
+            <span class="nav-icon"><svg class="icon"><use href="#i-star"></use></svg></span>
+            <span class="nav-label">Favorites</span>
+            <span class="nav-count" id="countFavorites">0</span>
+          </button>
+          <button class="nav-item" data-action="nav" data-view="tags" data-nav="tags">
+            <span class="nav-icon"><svg class="icon"><use href="#i-tag"></use></svg></span>
+            <span class="nav-label">Tags</span>
+            <span class="nav-count" id="countTags">0</span>
+          </button>
+          <button class="nav-item nav-trash" data-action="nav" data-view="trash" data-nav="trash" data-drop-trash>
+            <span class="nav-icon"><svg class="icon"><use href="#i-trash"></use></svg></span>
+            <span class="nav-label">Trash</span>
+            <span class="nav-count" id="countTrash">0</span>
+          </button>
+        </nav>
+
+        <section class="folder-section" aria-label="Folders">
+          <div class="section-head">
+            <span class="section-title">Folders</span>
+            <button class="icon-btn tiny" data-action="new-folder" aria-label="Create folder" title="Create folder">
+              <svg class="icon"><use href="#i-plus"></use></svg>
+            </button>
+          </div>
+          <div class="folder-tree" id="folderTree" role="tree" aria-label="Folders"></div>
+        </section>
+      </div>
+
+      <div class="sidebar-footer" id="sidebarFooter"></div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <button class="icon-btn mobile-only" data-action="open-sidebar" aria-label="Open sidebar" title="Open sidebar">
+          <svg class="icon"><use href="#i-menu"></use></svg>
+        </button>
+
+        <div class="search" role="search">
+          <svg class="icon search-icon" aria-hidden="true"><use href="#i-search"></use></svg>
+          <input id="searchInput" type="text" placeholder="Search bookmarks, tags, or URLs…" autocomplete="off" spellcheck="false" aria-label="Search bookmarks">
+          <button class="search-clear" id="searchClear" data-action="clear-search" aria-label="Clear search" title="Clear search" hidden>
+            <svg class="icon"><use href="#i-x"></use></svg>
+          </button>
+          <kbd class="search-kbd">/</kbd>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="icon-btn" id="themeToggle" data-action="toggle-theme" aria-label="Switch to dark mode" title="Switch to dark mode">
+            <svg class="icon icon-sun"><use href="#i-sun"></use></svg>
+            <svg class="icon icon-moon"><use href="#i-moon"></use></svg>
+          </button>
+          <button class="icon-btn" id="dataBtn" data-action="open-data-menu" aria-label="Import or export data" title="Import / export" aria-haspopup="menu">
+            <svg class="icon"><use href="#i-database"></use></svg>
+          </button>
+          <button class="btn btn-primary" data-action="add-bookmark">
+            <svg class="icon"><use href="#i-plus"></use></svg>
+            <span class="btn-label">Add bookmark</span>
+            <kbd class="btn-kbd">N</kbd>
+          </button>
+        </div>
+      </header>
+
+      <main class="content" id="content" tabindex="-1">
+        <div class="page-head">
+          <div class="page-title-wrap">
+            <h1 id="viewTitle">All bookmarks</h1>
+            <p id="viewSubtitle"></p>
+          </div>
+          <div class="toolbar" id="toolbar">
+            <button class="btn btn-secondary btn-sm btn-danger-text" id="emptyTrashBtn" data-action="empty-trash" hidden>
+              <svg class="icon"><use href="#i-trash"></use></svg>
+              <span>Empty trash</span>
+            </button>
+            <label class="select-wrap">
+              <span class="sr-only">Sort bookmarks</span>
+              <select id="sortSelect" aria-label="Sort bookmarks">
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+                <option value="title">Title A–Z</option>
+                <option value="domain">Domain A–Z</option>
+              </select>
+              <svg class="icon select-chevron" aria-hidden="true"><use href="#i-chevron-down"></use></svg>
+            </label>
+            <div class="segmented" role="group" aria-label="Layout">
+              <button id="gridBtn" data-action="set-layout" data-layout="grid" aria-pressed="true" title="Grid view" aria-label="Grid view">
+                <svg class="icon"><use href="#i-grid"></use></svg>
+              </button>
+              <button id="listBtn" data-action="set-layout" data-layout="list" aria-pressed="false" title="List view" aria-label="List view">
+                <svg class="icon"><use href="#i-list"></use></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="subfolders" class="subfolders"></div>
+        <div id="tagBar" class="tag-bar"></div>
+        <div id="bookmarks" class="bookmarks grid" aria-live="polite"></div>
+        <div id="emptyState" class="empty-state" hidden></div>
+      </main>
+    </div>
+  </div>
+
+  <div id="menuRoot"></div>
+
+  <dialog id="appModal" class="modal" aria-labelledby="modalTitle"></dialog>
+
+  <div id="toastRoot" class="toast-root" aria-live="polite" aria-atomic="false"></div>
+
+  <input type="file" id="importInput" accept="application/json,.json" hidden>
+
+  <noscript>
+    <div class="noscript">Stash needs JavaScript enabled to manage your bookmarks.</div>
+  </noscript>
+
+  <script src="js/core.js" defer></script>
+  <script src="js/render.js" defer></script>
+  <script src="js/ui.js" defer></script>
+  <script src="js/app.js" defer></script>
+</body>
+</html>
